@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DAFO personal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: herramienta de trabajo tranquila, como un cuaderno de orientación bien maquetado
+   IDEA: la matriz DAFO de cuatro cuadrantes es el objeto central; todo alimenta esa matriz
+   PICTURE: la propia herramienta (cuadrantes, barras del test) es la imagen
+   COLOUR and TYPE: fondo blanco/aluminio, tinta casi negra, cuatro colores de cuadrante; Geist
+   LAYOUT: pasos en una columna con navegación fija, cuadrantes en rejilla 2x2 que se apila en móvil */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f4f6,#121417);--card:light-dark(#ffffff,#1b1e23);--ink:light-dark(#111318,#e8eaee);
+--mute:light-dark(#5b6270,#9aa1ad);--line:light-dark(#dfe2e7,#2c3038);--soft:light-dark(#eef0f3,#23272e);
+--acc:light-dark(#ff4f00,#ff7a3d);
+--F:light-dark(#0f766e,#2dd4bf);--D:light-dark(#b45309,#f59e0b);--O:light-dark(#1d4ed8,#60a5fa);--A:light-dark(#b91c1c,#f87171)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Geist,system-ui,sans-serif;overflow-x:clip}
+pre,.scroll{overflow-x:auto}.scroll a{flex:none}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.05;margin:0 0 8px;font-weight:600;text-wrap:balance}
+h2{font-size:24px;line-height:1.15;margin:0 0 4px;font-weight:600}
+h3{font-size:17px;margin:0;font-weight:600}
+p{margin:0 0 10px}.mute{color:var(--mute)}.small{font-size:14px}
+header.top{padding:28px max(5vw,16px) 8px;max-width:1240px;margin:auto}
+nav.steps{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+nav.steps .scroll{display:flex;gap:4px;padding:8px max(5vw,16px);max-width:1240px;margin:auto}
+nav.steps a{flex:none;text-decoration:none;color:var(--ink);padding:9px 14px;border-radius:999px;font-size:15px;border:1px solid transparent}
+nav.steps a:hover{border-color:var(--line)}
+nav.steps a b{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--soft);font-size:12px;margin-right:6px}
+nav.steps a.ok b{background:var(--F);color:#fff}
+main{max-width:1240px;margin:auto;padding:0 max(5vw,16px) 80px}
+section.band{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:clamp(18px,3vw,32px);margin-top:20px;scroll-margin-top:70px}
+.head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline;margin-bottom:14px}
+label{display:block;font-size:14px;color:var(--mute);margin:10px 0 4px}
+input,textarea,select{width:100%;font:16px/1.4 inherit;font-family:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-height:44px}
+textarea{resize:vertical;min-height:70px}
+input:focus,textarea:focus,select:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}
+button{font:inherit;font-size:15px;min-height:44px;padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button:hover{background:var(--soft)}
+button.pri{background:var(--ink);color:var(--card);border-color:var(--ink)}
+button.ghost{border-color:transparent;color:var(--mute)}
+button.del{min-height:36px;padding:4px 10px;font-size:14px;color:var(--mute)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+/* test */
+.tt{width:100%;border-collapse:collapse}
+.tt td{padding:6px 4px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tt td.n{font-size:15px}
+.lv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:2px;min-width:180px}
+.lv button{min-height:30px;padding:0;border-radius:3px;border:0;background:var(--soft);font-size:0}
+.lv button.on{background:var(--acc)}
+.lv button.on.l4{background:light-dark(#c2410c,#fb923c)}
+.tag{font-size:13px;color:var(--mute);white-space:nowrap}
+.tt select{min-height:36px;padding:4px 6px;font-size:14px;width:auto}
+.up{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:12px 0;padding:12px;border:1px dashed var(--line);border-radius:10px}
+.hint{font-size:13px;color:var(--mute);background:var(--soft);border-radius:6px;padding:6px 10px;margin-top:6px}.hint ul{margin:2px 0;padding-left:18px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--mute);margin:6px 0 10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.chip{font-size:14px;padding:4px 10px;border-radius:999px;background:var(--soft)}
+.chip.F{color:var(--F)}.chip.D{color:var(--D)}
+/* dafo */
+.dafo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.q{border:1px solid var(--line);border-top:5px solid var(--c);border-radius:10px;padding:14px;background:var(--card)}
+.q h3{color:var(--c)}.q .sub{font-size:13px;color:var(--mute)}
+.item{border:1px solid var(--line);border-radius:8px;padding:10px;margin-top:10px;background:light-dark(#fbfbfc,#1f2228)}
+.item .ih{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--mute)}
+.item label{margin-top:6px}
+details{margin-top:10px;font-size:14px}
+summary{cursor:pointer;color:var(--mute);min-height:32px;display:flex;align-items:center}
+details ul{margin:6px 0;padding-left:20px}details li{margin:3px 0}
+details.ref{background:var(--soft);border-radius:8px;padding:4px 12px}
+.add{margin-top:10px;width:100%;border-style:dashed}
+/* plan */
+.plan{display:grid;gap:12px}
+.pr{border:1px solid var(--line);border-left:5px solid var(--c,var(--line));border-radius:10px;padding:12px 14px}
+.pr .grid2 label{margin-top:8px}
+/* reflexión */
+.meter{height:8px;background:var(--soft);border-radius:4px;overflow:hidden;margin-top:8px}
+.meter i{display:block;height:100%;background:var(--acc);transition:width .2s}
+/* check */
+.check{list-style:none;padding:0;margin:0 0 16px}
+.check li{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.check li i{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:13px;color:#fff;background:var(--D)}
+.check li.ok i{background:var(--F)}
+.pts{font-size:13px;color:var(--mute);white-space:nowrap;margin-left:auto}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--card);padding:10px 16px;border-radius:10px;display:none;gap:12px;align-items:center;z-index:20;max-width:92vw}
+#toast button{min-height:34px;background:transparent;color:var(--card);border-color:var(--card)}
+@media(max-width:760px){.dafo,.grid2{grid-template-columns:minmax(0,1fr)}.lv{min-width:84px}.tt td.tag{display:none}.tt td.n{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.meter i{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+<h1>DAFO personal y plan de acción</h1>
+<p class="mute">IPOP · RA4 y RA5 — Tú escribes el contenido; la herramienta te guía paso a paso, comprueba la rúbrica y genera el PDF para Moodle. Tus datos se guardan solo en tu navegador: nadie más los ve. Haz una copia de seguridad (.json) si cambias de dispositivo.</p>
+</header>
+<nav class="steps"><div class="scroll" id="nav"></div></nav>
+<main>
+<section class="band" id="datos">
+<div class="head"><h2>1 · Datos</h2><span class="mute small">Portada del PDF</span></div>
+<div class="grid2">
+<div><label for="d-nombre">Nombre y apellidos</label><input id="d-nombre" data-p="datos.nombre"></div>
+<div><label for="d-ciclo">Ciclo / curso</label><input id="d-ciclo" data-p="datos.ciclo" placeholder="p. ej. 1.º DAM"></div>
+<div><label for="d-centro">Centro</label><input id="d-centro" data-p="datos.centro"></div>
+<div><label for="d-fecha">Fecha de entrega</label><input id="d-fecha" data-p="datos.fecha" placeholder="dd/mm/aaaa"></div>
+</div>
+</section>
+
+<section class="band" id="test">
+<div class="head"><h2>2 · Resultados del test .Clau</h2><span class="pts">Rúbrica: 2 puntos</span></div>
+<p class="mute small">Barcelona Activa — Competències Clau. Copia de tu informe el nivel de cada competencia tocando la barra, y marca con ↑/↓ las que salen por encima o por debajo de la media.</p>
+<div class="up"><button type="button" class="pri" data-a="clau">Subir informe del test (.pdf)</button><input type="file" id="fclau" accept="application/pdf,.pdf" hidden><span class="small mute" id="upmsg">Rellena esta sección automáticamente con el PDF de resultados de Barcelona Activa.</span></div>
+<div class="legend"><span>Barra: Inicial · Medio · Medio-alto · Alto</span><span>↑ por encima de la media · ↓ por debajo</span></div>
+<div class="scroll"><table class="tt"><tbody id="tt"></tbody></table></div>
+<div class="grid2">
+<div><label for="t-dest">Competencia más destacada</label><select id="t-dest" data-p="test.destacada"></select></div>
+<div><label for="t-fecha">Fecha del test</label><input id="t-fecha" data-p="test.fecha"></div>
+</div>
+<label>Candidatas según el test</label>
+<div class="chips" id="cands"></div>
+<label for="t-notas">Conclusiones del test: ¿qué resultados te identifican más y por qué?</label>
+<textarea id="t-notas" data-p="test.notas" rows="4"></textarea>
+</section>
+
+<section class="band" id="dafo">
+<div class="head"><h2>3 · DAFO personal</h2><span class="pts">Rúbrica: 3 puntos</span></div>
+<p class="mute small">Fortalezas y debilidades son internas: vincúlalas a una competencia del test. Oportunidades y amenazas son del entorno. Apunta a 4–6 elementos por cuadrante.</p>
+<div class="dafo" id="dafoq"></div>
+</section>
+
+<section class="band" id="plan">
+<div class="head"><h2>4 · Plan de acción</h2><span class="pts">Rúbrica: 3 puntos</span></div>
+<p class="mute small">Una fila por objetivo. Sé concreto: nombra cursos, certificaciones o recursos y pon un plazo a cada uno.</p>
+<div class="plan" id="planl"></div>
+<button class="add" data-a="addplan">+ Añadir acción</button>
+</section>
+
+<section class="band" id="reflexion">
+<div class="head"><h2>5 · Reflexión final</h2><span class="pts">Rúbrica: 2 puntos</span></div>
+<details open><summary>Preguntas que debe responder</summary><ul>
+<li>¿Crees que puedes mejorar tus soft skills y competencias clave?</li>
+<li>¿Cuáles crees que son las más importantes para la empresa?</li>
+<li>¿Has pensado en las causas y consecuencias de tener unas habilidades más desarrolladas que otras?</li></ul></details>
+<label for="r-txt">Reflexión (unas diez líneas)</label>
+<textarea id="r-txt" data-p="reflexion" rows="10"></textarea>
+<div class="mute small" id="rcount"></div>
+<div class="meter"><i id="rmeter"></i></div>
+</section>
+
+<section class="band" id="entrega">
+<div class="head"><h2>6 · Revisión y entrega</h2><span class="mute small">Formato: PDF en Moodle</span></div>
+<ul class="check" id="check"></ul>
+<div class="row">
+<button class="pri" data-a="pdf">Descargar PDF</button>
+<button data-a="json">Copia de seguridad (.json)</button>
+<button data-a="import">Importar copia</button>
+<input type="file" id="fimp" accept=".json,application/json" hidden>
+<button data-a="copy">Copiar datos</button>
+<button class="ghost" data-a="reset">Vaciar todo</button>
+</div>
+<p class="mute small" id="msg" style="margin-top:10px"></p>
+</section>
+</main>
+<div id="toast"><span id="tmsg"></span><button id="tbtn">Deshacer</button></div>
+<script type="application/json" id="saved">null</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+{
+const TPL='<!DOCTYPE html>\n'+document.documentElement.outerHTML.replace(/^<html[^>]*>/,'<html lang="es">');
+const COMPS=['Iniciativa','Orientación al logro','Planificación y organización','Preocupación por el orden y la calidad','Dirección de personas','Liderazgo','Trabajo en equipo y cooperación','Autoconfianza','Autocontrol','Compromiso con la organización','Flexibilidad y gestión del cambio','Comunicación','Empatía','Negociación','Networking','Orientación al cliente','Aprendizaje y utilización de conocimientos','Creatividad','Orientación estratégica','Pensamiento analítico','Pensamiento conceptual'];
+const LV=['—','Inicial','Medio','Medio-alto','Alto'];
+const Q={F:{t:'Fortalezas',s:'Internas · positivas',c:'--F',ev:'Prueba (Logro–Acción–Resultado)'},
+D:{t:'Debilidades',s:'Internas · a mejorar',c:'--D',ev:'Cómo se manifiesta'},
+O:{t:'Oportunidades',s:'Externas · te ayudan',c:'--O',ev:'Fuente o dato del entorno'},
+A:{t:'Amenazas',s:'Externas · te frenan',c:'--A',ev:'Fuente o dato del entorno'}};
+const QS={F:['¿En qué soy bueno/a? ¿Qué me diferencia de los demás?','¿Qué logros personales o profesionales he conseguido?','¿Qué ven como fortaleza mis superiores, familia y amigos?','¿Tengo experiencia liderando, aunque sea en un entorno social?','¿Me adapto fácilmente a los cambios?','¿De qué experiencia laboral me siento más orgulloso/a?','¿Qué recursos tengo que me acercan a mi objetivo profesional?'],
+D:['¿Qué puedo mejorar? ¿Qué evito hacer?','¿En qué aspectos recibo críticas?','¿Qué tienen otros candidatos que me deja en desventaja?','¿Tengo un objetivo claro y definido?','¿Cómo es mi red de contactos?','¿Tengo flexibilidad horaria, geográfica y familiar?','¿Voy con retraso en alguna tarea importante?'],
+O:['¿Qué tendencias o situaciones pueden beneficiarme?','¿Qué oportunidades de aprendizaje o networking existen?','¿Qué cambios en mi entorno, leyes o patrones sociales me afectan?','¿Cómo está el mercado laboral? ¿Qué sectores valoran mi perfil?','¿Tengo oportunidades internacionales o de promoción?','¿Puedo diversificar? ¿Tengo perfil emprendedor?'],
+A:['¿Qué obstáculos pueden impedir mi progreso?','¿Cómo puede afectarme la situación del mercado?','¿Qué hacen mis competidores? ¿Tienen habilidades más potentes?','¿La inteligencia artificial o las nuevas tecnologías son una amenaza?','¿Hay cambios de ley o en la industria que me perjudiquen?','¿Mi recorrido profesional presenta dificultades?']};
+const REF={F:['Conocimientos de software avanzado','Trabajo en equipo','Mente creativa','Capacidad de autoaprendizaje'],
+D:['Baja autoconfianza','Habilidades comunicativas','Gestión del tiempo','Poca experiencia laboral','Idioma inglés'],
+O:['Digitalización de procesos empresariales + e-commerce','Futuras especializaciones','Networking empresarial','Programas de becas'],
+A:['Competencia de otros candidatos','Consolidación de la IA','Mercado en constante actualización','Dependencia de herramientas tecnológicas']};
+const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+const loadScript=src=>new Promise((ok,ko)=>{if(document.querySelector(`script[src="${src}"]`))return ok();const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=()=>ko(new Error('no se pudo cargar '+src));document.head.appendChild(s)});
+async function loadPdfJs(){
+ if(!window.pdfjsLib)await loadScript(PDFJS+'pdf.min.js');
+ if(!window.pdfjsWorker)await loadScript(PDFJS+'pdf.worker.min.js');
+ window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js';
+ return window.pdfjsLib;
+}
+const norm=t=>String(t).normalize('NFKD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z ]+/g,' ').replace(/\s+/g,' ').trim();
+const CAT=['Iniciativa',"Orientació a l'assoliment",'Planificació i organització',"Preocupació per l'ordre i la qualitat",'Direcció de persones','Lideratge','Treball en equip i cooperació','Autoconfiança','Autocontrol',"Compromís amb l'organització",'Flexibilitat i gestió del canvi','Comunicació','Empatia','Negociació','Networking','Orientació al client','Aprenentatge i utilització de coneixements','Creativitat','Orientació estratègica','Pensament analític','Pensament conceptual'];
+const ENG=['Initiative','Achievement orientation','Planning and organization','Concern for order and quality','People management','Leadership','Teamwork and cooperation','Self-confidence','Self-control','Organizational commitment','Flexibility and change management','Communication','Empathy','Negotiation','Networking','Customer orientation','Learning and use of knowledge','Creativity','Strategic orientation','Analytical thinking','Conceptual thinking'];
+const NAMEIDX=new Map();[CAT,COMPS,ENG].forEach(list=>list.forEach((n,i)=>NAMEIDX.set(norm(n),i)));
+const compOf=t=>{const k=norm(t.replace(/^[•●\-\s]+/,''));return NAMEIDX.has(k)?NAMEIDX.get(k):-1};
+const MONTHS={gener:1,enero:1,january:1,febrer:2,febrero:2,february:2,marc:3,marzo:3,march:3,abril:4,april:4,maig:5,mayo:5,may:5,juny:6,junio:6,june:6,juliol:7,julio:7,july:7,agost:8,agosto:8,august:8,setembre:9,septiembre:9,september:9,octubre:10,october:10,novembre:11,noviembre:11,november:11,desembre:12,diciembre:12,december:12};
+async function pageLines(page){
+ const tc=await page.getTextContent();const rows=[];
+ for(const it of tc.items){if(!it.str.trim())continue;const y=Math.round(it.transform[5]),x=it.transform[4];
+  let r=rows.find(r=>Math.abs(r.y-y)<=2);if(!r)rows.push(r={y,items:[]});r.items.push({x,s:it.str,w:it.width})}
+ rows.sort((a,b)=>b.y-a.y);rows.forEach(r=>r.items.sort((a,b)=>a.x-b.x));
+ return rows;
+}
+// levels from the bar chart on page 1: count red segments per bar
+async function readBars(page){
+ const vp=page.getViewport({scale:3});const c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;
+ const ctx=c.getContext('2d',{willReadFrequently:true});await page.render({canvasContext:ctx,viewport:vp}).promise;
+ const {data,width:W,height:H}=ctx.getImageData(0,0,c.width,c.height);
+ const red=(x,y)=>{const i=(y*W+x)*4,r=data[i],g=data[i+1],b=data[i+2];return r>190&&r-g>70&&r-b>70};
+ const firstX=new Map();
+ for(let y=0;y<H;y++){for(let x=Math.floor(W*.3);x<W*.95;x++){if(red(x,y)){firstX.set(y,x);break}}}
+ const hist={};for(const x of firstX.values())hist[x]=(hist[x]||0)+1;
+ const left=+Object.entries(hist).sort((a,b)=>b[1]-a[1])[0]?.[0];if(!left)return null;
+ const bars=[];let cur=null;
+ for(let y=0;y<H;y++){const on=red(left+2,y)&&red(left+6,y);if(on){if(!cur)bars.push(cur={y0:y,y1:y});cur.y1=y}else cur=null}
+ const good=bars.filter(b=>b.y1-b.y0>=4);
+ const lv=good.map(b=>{const y=Math.round((b.y0+b.y1)/2);let runs=0,inRun=false,gap=0;
+  for(let x=left;x<W;x++){if(red(x,y)){if(!inRun){runs++;inRun=true}gap=0}else{inRun=false;if(++gap>12)break}}
+  return runs});
+ return lv.length===21&&lv.every(n=>n>=1&&n<=4)?lv:null;
+}
+async function parseClau(file){
+ const lib=await loadPdfJs();
+ const pdf=await lib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+ const out={nombre:'',fecha:'',niveles:null,media:{},destacada:'',detalle:{}};
+ const all=[];for(let p=1;p<=pdf.numPages;p++){const pg=await pdf.getPage(p);all.push({pg,lines:await pageLines(pg)})}
+ const text=all.map(p=>p.lines.map(r=>r.items.map(i=>i.s).join(' ')).join('\n')).join('\n');
+ if(!/comp[eè]t[eè]nci|competenc/i.test(text)||!/clau/i.test(text))throw new Error('Este PDF no parece un informe del test .Clau de Barcelona Activa.');
+ const m=text.match(/(\d{1,2})\s+de\s+([A-Za-zÀ-ÿ]+)\s+de\s+(\d{4})/);
+ if(m){const mo=MONTHS[norm(m[2])];if(mo)out.fecha=`${m[1].padStart(2,'0')}/${String(mo).padStart(2,'0')}/${m[3]}`}
+ const first=all[0].lines.map(r=>r.items.map(i=>i.s).join(' ').trim());
+ const ni=first.findIndex(l=>/^resultats|^resultados|^results/i.test(l));
+ const rawName=ni>0?first[ni-1].replace(/\s+/g,' ').trim():'';
+ if(ni>0)out.nombre=first[ni-1].replace(/\bnull\b/gi,'').replace(/\s+/g,' ').trim().toLowerCase().replace(/(^|\s)\S/g,c=>c.toUpperCase());
+ const dm=text.match(/m[ée]s destacada (?:es|és)\s*:?\s*\n?\s*([^\n]+)/i);
+ if(dm){const k=compOf(dm[1]);if(k>=0)out.destacada=String(k)}
+ // above / below average: two columns under the headers
+ for(const {lines} of all){const AB=/^\s*(per sobre de la mitjana|por encima de la media|above (the )?average)\s*$/i,BE=/^\s*(per sota de la mitjana|por debajo de la media|below (the )?average)\s*$/i;
+  const h=lines.findIndex(r=>r.items.some(i=>AB.test(i.s)));if(h<0)continue;
+  const hdr=lines[h].items;const above=hdr.find(i=>AB.test(i.s)),below=hdr.find(i=>BE.test(i.s));const split=below?(above.x+below.x)/2:Infinity;
+  for(let k=h+1;k<lines.length;k++){let any=false;for(const it of lines[k].items){const c=compOf(it.s);if(c>=0){out.media[c]=it.x<split?'+':'-';any=true}}if(!any&&k>h+1)break}}
+ // strengths / weaknesses per competency (pages 2+)
+ let comp=-1,mode=null,bullet=null;
+ const flush=()=>{if(bullet&&comp>=0&&mode){const d=out.detalle[comp]||(out.detalle[comp]={f:[],d:[]});d[mode].push(bullet.trim())}bullet=null};
+ for(const {lines} of all.slice(1)){for(const r of lines){const l=r.items.map(i=>i.s).join(' ').replace(/\s+/g,' ').trim();
+  if(/^recorda|^recuerda|tasques, formaci|tareas, formaci|^©|barcelona activa|^test de compet|resultats del test|resultados del test|^p[aà]gina/i.test(l)||(rawName&&l===rawName))continue;
+  const c=compOf(l);
+  if(c>=0){flush();comp=c;mode=null;continue}
+  if(/^punts forts|^puntos fuertes/i.test(l)){flush();mode='f';continue}
+  if(/^punts febles|^puntos d[eé]biles/i.test(l)){flush();mode='d';continue}
+  if(/^3\.2|en qu[eè] destaques|en qu[eé] destacas/i.test(l)){flush();comp=-1;mode=null;break}
+  if(!mode)continue;
+  if(/^[●•]/.test(l)){flush();bullet=l.replace(/^[●•]\s*/,'')}else if(bullet!==null)bullet+=' '+l}}
+ flush();
+ out.niveles=await readBars(all[0].pg);
+ return out;
+}
+
+const fresh=()=>({v:1,updated:0,datos:{nombre:'',ciclo:'',centro:'',fecha:''},
+test:{fecha:'',niveles:Array(21).fill(0),media:{},destacada:'',notas:'',detalle:{}},
+dafo:{F:[],D:[],O:[],A:[]},plan:[],reflexion:''});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+const uid=()=>Math.random().toString(36).slice(2,9);
+let S;
+{let saved=null,local=null;
+try{saved=JSON.parse($('saved').textContent)}catch(e){}
+try{local=JSON.parse(localStorage.getItem('dafo-personal-plantilla-v1'))}catch(e){}
+const ok=x=>x&&x.v===1&&x.dafo;
+S=[saved,local].filter(ok).sort((a,b)=>b.updated-a.updated)[0]||fresh();}
+let tm;
+const persist=()=>{S.updated=Date.now();clearTimeout(tm);tm=setTimeout(()=>{try{localStorage.setItem('dafo-personal-plantilla-v1',JSON.stringify(S))}catch(e){}},250)};
+const getP=p=>p.split('.').reduce((o,k)=>o?.[k],S);
+const setP=(p,v)=>{const k=p.split('.');const last=k.pop();k.reduce((o,x)=>o[x],S)[last]=v};
+
+const STEPS=[['datos','Datos'],['test','Test'],['dafo','DAFO'],['plan','Plan'],['reflexion','Reflexión'],['entrega','Entrega']];
+const label=(q,i)=>q+(i+1);
+const allItems=()=>['F','D','O','A'].flatMap(q=>S.dafo[q].map((it,i)=>({q,i,it})));
+const words=t=>(t.trim().match(/\S+/g)||[]).length;
+
+function renderTest(){
+ $('tt').innerHTML=COMPS.map((c,i)=>{const l=S.test.niveles[i];const m=S.test.media[i]||'';
+  return `<tr><td class="n">${esc(c)}</td><td><div class="lv" role="group" aria-label="Nivel de ${esc(c)}">${[1,2,3,4].map(v=>`<button data-lv="${i}:${v}" class="${v<=l?'on':''} ${v===4?'l4':''}" aria-label="${LV[v]}" aria-pressed="${v<=l}">${LV[v]}</button>`).join('')}</div></td><td class="tag">${LV[l]}</td><td><select data-media="${i}" aria-label="Respecto a la media"><option value="" ${m===''?'selected':''}>—</option><option value="+" ${m==='+'?'selected':''}>↑</option><option value="-" ${m==='-'?'selected':''}>↓</option></select></td></tr>`}).join('');
+ $('t-dest').innerHTML='<option value="">— Elige —</option>'+COMPS.map((c,i)=>`<option value="${i}" ${String(S.test.destacada)===String(i)?'selected':''}>${esc(c)}</option>`).join('');
+ const f=COMPS.map((c,i)=>i).filter(i=>S.test.niveles[i]>=4||S.test.media[i]==='+');
+ const d=COMPS.map((c,i)=>i).filter(i=>S.test.niveles[i]<=1||S.test.media[i]==='-');
+ $('cands').innerHTML=f.map(i=>`<span class="chip F">F · ${esc(COMPS[i])}</span>`).join('')+d.map(i=>`<span class="chip D">D · ${esc(COMPS[i])}</span>`).join('');
+}
+function compSelect(q,i,v){
+ return `<label for="c-${q}${i}">Competencia del test relacionada</label><select id="c-${q}${i}" data-p="dafo.${q}.${i}.comp"><option value="">— Ninguna (dato fuera del test) —</option>${COMPS.map((c,k)=>`<option value="${k}" ${String(v)===String(k)?'selected':''}>${esc(c)} · ${LV[S.test.niveles[k]]}</option>`).join('')}</select>`}
+function hint(q,c){if(c===''||c==null)return'';const d=(S.test.detalle||{})[c];if(!d)return'';
+ const main=q==='F'?d.f:d.d,other=q==='F'?d.d:d.f;const list=main.length?main:other;if(!list.length)return'';
+ return `<div class="hint">${main.length?(q==='F'?'Puntos fuertes':'Puntos débiles'):(q==='F'?'Puntos débiles':'Puntos fuertes')} según tu test:<ul>${list.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`}
+function renderDafo(){
+ $('dafoq').innerHTML=['F','D','O','A'].map(q=>{const m=Q[q];
+  return `<div class="q" style="--c:var(${m.c})"><h3>${m.t} <span class="sub">${S.dafo[q].length} · ${m.s}</span></h3>
+  <details><summary>Preguntas guía</summary><ul>${QS[q].map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details>
+  ${S.dafo[q].map((it,i)=>`<div class="item"><div class="ih"><span>${label(q,i)}</span><button class="del" data-del="dafo.${q}.${i}" aria-label="Eliminar ${label(q,i)}">Eliminar</button></div>
+   <label for="t-${q}${i}">Elemento</label><textarea id="t-${q}${i}" rows="2" data-p="dafo.${q}.${i}.text">${esc(it.text)}</textarea>
+   ${q==='F'||q==='D'?compSelect(q,i,it.comp)+hint(q,it.comp):''}
+   <label for="e-${q}${i}">${m.ev}</label><textarea id="e-${q}${i}" rows="2" data-p="dafo.${q}.${i}.evid">${esc(it.evid)}</textarea></div>`).join('')}
+  <button class="add" data-add="${q}">+ Añadir ${m.t.toLowerCase().replace(/s$/,'').replace(/de$/,'d')}</button>
+  <details class="ref"><summary>Ver ejemplo (perfil AFI/MIP)</summary><p class="small mute">Ejemplo de DAFO del material de clase. Escribe el tuyo con tus palabras y tus pruebas.</p><ul>${REF[q].map(x=>`<li>${esc(x)}</li>`).join('')}</ul></details></div>`}).join('');
+}
+function refOptions(sel){
+ return `<option value="">— Elige el punto del DAFO —</option>`+allItems().map(({q,i,it})=>`<option value="${it.id}" ${sel===it.id?'selected':''}>${label(q,i)} · ${esc((it.text||'(sin texto)').slice(0,60))}</option>`).join('')}
+function renderPlan(){
+ const byId=Object.fromEntries(allItems().map(x=>[x.it.id,x]));
+ $('planl').innerHTML=S.plan.length?S.plan.map((r,i)=>{const t=byId[r.ref];
+  return `<div class="pr" style="--c:${t?`var(${Q[t.q].c})`:'var(--line)'}"><div class="ih row" style="justify-content:space-between"><h3>Acción ${i+1}</h3><button class="del" data-del="plan.${i}">Eliminar</button></div>
+  <label for="p-ref${i}">Punto del DAFO que trabaja</label><select id="p-ref${i}" data-p="plan.${i}.ref">${refOptions(r.ref)}</select>
+  <div class="grid2"><div><label for="p-obj${i}">Objetivo</label><input id="p-obj${i}" data-p="plan.${i}.obj" value="${esc(r.obj)}"></div>
+  <div><label for="p-pl${i}">Plazo</label><input id="p-pl${i}" data-p="plan.${i}.plazo" value="${esc(r.plazo)}" placeholder="p. ej. junio 2027"></div></div>
+  <label for="p-acc${i}">Acciones concretas</label><textarea id="p-acc${i}" rows="3" data-p="plan.${i}.acc">${esc(r.acc)}</textarea>
+  <div class="grid2"><div><label for="p-rec${i}">Recursos, cursos o certificaciones</label><input id="p-rec${i}" data-p="plan.${i}.rec" value="${esc(r.rec)}"></div>
+  <div><label for="p-ind${i}">¿Cómo sabré que lo he logrado?</label><input id="p-ind${i}" data-p="plan.${i}.ind" value="${esc(r.ind)}"></div></div></div>`}).join(''):'<p class="mute">Aún no hay acciones. Empieza por tus debilidades y amenazas principales.</p>';
+}
+function renderRef(){
+ const w=words(S.reflexion),lines=Math.round(w/13);
+ $('rcount').textContent=`${w} palabras · ≈ ${lines} líneas en el PDF · objetivo: 120–180 palabras (≈ 10 líneas)`;
+ $('rmeter').style.width=Math.min(100,w/150*100)+'%';
+}
+function checks(){
+ const fd=[...S.dafo.F,...S.dafo.D].filter(x=>x.text.trim());
+ const linked=fd.filter(x=>x.comp!==''&&x.comp!=null).length;
+ const quads=['F','D','O','A'].map(q=>S.dafo[q].filter(x=>x.text.trim()).length);
+ const rows=S.plan.filter(r=>r.acc.trim()||r.obj.trim());
+ const complete=rows.filter(r=>r.ref&&r.acc.trim()&&r.rec.trim()&&r.plazo.trim()).length;
+ const used=new Set(S.plan.map(r=>r.ref));
+ const unc=['D','A'].flatMap(q=>S.dafo[q].map((it,i)=>({q,i,it}))).filter(x=>x.it.text.trim()&&!used.has(x.it.id)).map(x=>label(x.q,x.i));
+ const w=words(S.reflexion);
+ return [
+ ['Datos de portada completos',S.datos.nombre.trim()&&S.datos.ciclo.trim(),'',0],
+ ['Niveles del test introducidos ('+S.test.niveles.filter(n=>n>0).length+'/21)',S.test.niveles.every(n=>n>0),'Rúbrica 2 pts',1],
+ ['Conclusiones del test redactadas',words(S.test.notas)>=25,'Rúbrica 2 pts',1],
+ [`Fortalezas y debilidades vinculadas al test (${linked}/${fd.length})`,fd.length&&linked>=Math.ceil(fd.length*.75),'Rúbrica 2 pts',2],
+ [`Al menos 3 elementos por cuadrante (F ${quads[0]} · D ${quads[1]} · O ${quads[2]} · A ${quads[3]})`,quads.every(n=>n>=3),'Rúbrica 3 pts',2],
+ [`Acciones con punto DAFO, recurso y plazo (${complete}/${rows.length})`,rows.length>=4&&complete===rows.length,'Rúbrica 3 pts',3],
+ [unc.length?`Debilidades/amenazas sin acción: ${unc.join(', ')}`:'Todas las debilidades y amenazas tienen acción',!unc.length&&[...S.dafo.D,...S.dafo.A].some(x=>x.text.trim()),'Rúbrica 3 pts',3],
+ [`Reflexión de unas diez líneas (${w} palabras)`,w>=110&&w<=230,'Rúbrica 2 pts',4]];
+}
+function renderCheck(){
+ const c=checks();
+ $('check').innerHTML=c.map(([t,ok,p])=>`<li class="${ok?'ok':''}"><i>${ok?'✓':'!'}</i><span>${esc(t)}</span><span class="pts">${p}</span></li>`).join('');
+ const st=[!!c[0][1],c[1][1]&&c[2][1]&&c[3][1],c[4][1],c[5][1]&&c[6][1],c[7][1],c.every(x=>x[1])];
+ $('nav').innerHTML=STEPS.map(([id,t],i)=>`<a href="#${id}" class="${st[i]?'ok':''}"><b>${st[i]?'✓':i+1}</b>${t}</a>`).join('');
+}
+function fill(){document.querySelectorAll('[data-p]').forEach(el=>{if(el.closest('#dafoq,#planl'))return;const v=getP(el.dataset.p);if(el.tagName!=='SELECT')el.value=v??''})}
+function renderAll(){renderTest();renderDafo();renderPlan();renderRef();fill();renderCheck()}
+renderAll();
+
+let ck;
+document.addEventListener('input',e=>{const el=e.target;
+ if(el.dataset.p){setP(el.dataset.p,el.value);persist();
+  if(el.dataset.p==='reflexion')renderRef();
+  if(/^plan\.\d+\.ref$/.test(el.dataset.p))renderPlan();
+  if(/^dafo\.\w\.\d+\.comp$/.test(el.dataset.p))renderDafo();
+  if(/^dafo\.\w\.\d+\.text$/.test(el.dataset.p)){clearTimeout(ck);ck=setTimeout(()=>{const a=document.activeElement;S.plan.length&&!a.closest?.('#planl')&&renderPlan()},600)}
+  renderCheck()}
+ if(el.dataset.media){const i=+el.dataset.media;if(el.value)S.test.media[i]=el.value;else delete S.test.media[i];persist();renderTest()}
+});
+let undo=null,tt;
+function toast(m,u){undo=u;$('tmsg').textContent=m;$('tbtn').style.display=u?'':'none';$('toast').style.display='flex';clearTimeout(tt);tt=setTimeout(()=>{$('toast').style.display='none';undo=null},6000)}
+$('tbtn').addEventListener('click',()=>{if(undo){undo();undo=null;persist();renderAll()}$('toast').style.display='none'});
+const msg=t=>{$('msg').textContent=t};
+document.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.lv){const[i,v]=b.dataset.lv.split(':').map(Number);S.test.niveles[i]=v;persist();renderTest();renderDafo();renderCheck();return}
+ if(b.dataset.add){const q=b.dataset.add;S.dafo[q].push({id:uid(),text:'',comp:'',evid:''});persist();renderDafo();renderPlan();renderCheck();const n=S.dafo[q].length-1;$(`t-${q}${n}`)?.focus();return}
+ if(b.dataset.del){const k=b.dataset.del.split('.');const idx=+k.pop();const arr=getP(k.join('.'));const [it]=arr.splice(idx,1);persist();renderAll();toast('Elemento eliminado',()=>arr.splice(idx,0,it));return}
+ const a=b.dataset.a;
+ if(a==='addplan'){S.plan.push({ref:'',obj:'',acc:'',rec:'',plazo:'',ind:''});persist();renderPlan();renderCheck();return}
+ if(a==='reset'){if(b.dataset.sure){const old=S;S=fresh();persist();renderAll();toast('Todo vaciado',()=>{S=old});delete b.dataset.sure;b.textContent='Vaciar todo'}else{b.dataset.sure=1;b.textContent='Pulsa otra vez para confirmar';setTimeout(()=>{delete b.dataset.sure;b.textContent='Vaciar todo'},4000)}return}
+ if(a==='import'){$('fimp').click();return}
+ if(a==='clau'){$('fclau').click();return}
+ if(a==='json'){save(`DAFO_copia_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify(S,null,2));return}
+ if(a==='pdf'){try{const blob=buildPDF();save(fileName(),blob)}catch(err){msg('No se pudo generar el PDF: '+err.message)}return}
+ if(a==='savepage'){savePage();return}
+ if(a==='copy'){try{await navigator.clipboard.writeText(JSON.stringify(S));msg('Datos copiados al portapapeles.')}catch(err){msg('No se pudo copiar automáticamente.')}return}
+});
+$('fclau').addEventListener('change',async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
+ const um=$('upmsg');um.textContent='Leyendo el informe…';
+ try{const r=await parseClau(f);const old=JSON.parse(JSON.stringify({test:S.test,nombre:S.datos.nombre}));
+  if(r.niveles)S.test.niveles=r.niveles;S.test.media=r.media;if(r.destacada!=='')S.test.destacada=r.destacada;if(r.fecha)S.test.fecha=r.fecha;S.test.detalle=r.detalle;
+  if(!S.datos.nombre.trim()&&r.nombre)S.datos.nombre=r.nombre;
+  persist();renderAll();
+  const nA=Object.values(r.media).filter(x=>x==='+').length,nB=Object.values(r.media).filter(x=>x==='-').length;
+  um.textContent=(r.niveles?'Importado: 21 niveles':'No se pudieron leer los niveles de la gráfica: introdúcelos a mano')+` · ${nA} por encima y ${nB} por debajo de la media${r.fecha?' · test del '+r.fecha:''}. Revisa que coincida con tu informe.`;
+  toast('Test importado',()=>{S.test=old.test;S.datos.nombre=old.nombre})}
+ catch(err){um.textContent=err&&err.message&&/Clau/.test(err.message)?err.message:'No se pudo leer el PDF. Comprueba que es el informe del test .Clau o introduce los datos a mano.'}});
+$('fimp').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{const x=JSON.parse(await f.text());if(!x||x.v!==1||!x.dafo)throw 0;const old=S;S=x;persist();renderAll();toast('Copia importada',()=>{S=old})}catch(err){msg('Ese archivo no es una copia válida de esta herramienta.')}e.target.value=''});
+
+let dl=null,art=null;
+const fileName=()=>`DAFO_Personal_${(S.datos.nombre.trim()||'alumno').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w]+/g,'_')}.pdf`;
+function plainDownload(name,data){
+ const blob=data instanceof Blob?data:new Blob([data],{type:name.endsWith('.json')?'application/json':'application/octet-stream'});
+ const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+ $('msg').innerHTML='';const t=document.createElement('span');t.textContent='Si la descarga no empieza, ';const l=document.createElement('a');l.href=url;l.download=name;l.target='_blank';l.rel='noopener';l.textContent='pulsa aquí para abrir '+name;$('msg').append(t,l);
+ setTimeout(()=>URL.revokeObjectURL(url),120000);
+}
+async function save(name,data){
+ if(!dl){msg('Comprobando la descarga…');await initCaps()}
+ if(!dl){plainDownload(name,data);return}
+ try{await dl.save({filename:name,data});msg('Archivo enviado: '+name)}
+ catch(err){const c=err&&err.code;msg(c==='declined'?'Descarga cancelada.':c==='rate_limited'?'Espera un momento y vuelve a intentarlo.':c==='host_unavailable'?'Esta app no puede guardar archivos: abre la herramienta en un navegador.':'No se pudo descargar ('+(c||'error')+').')}
+}
+async function savePage(){
+ if(!art)return;
+ const json=JSON.stringify(S).replace(/</g,'\\u003c');
+ const html=TPL.replace(/(<script type="application\/json" id="saved">)[\s\S]*?(<\/script>)/,(m,a,b)=>a+json+b);
+ try{msg('Guardando…');await art.publish(html);msg('Guardado en la página.')}catch(err){msg(err&&err.code==='conflict'?'Se guardó otra versión a la vez; la página se ha recargado.':'No se pudo guardar en la página.')}
+}
+let capsP=null;
+const initCaps=()=>capsP||(capsP=(async()=>{try{for(let i=0;i<25&&!window.claude?.use;i++)await new Promise(r=>setTimeout(r,200));
+ if(!window.claude?.use)return;
+ dl=await claude.use('downloads').catch(()=>null)}catch(e){}})());
+initCaps();
+
+function buildPDF(){
+ const {jsPDF}=window.jspdf||{};if(!jsPDF)throw new Error('librería PDF no cargada (revisa la conexión)');
+ const doc=new jsPDF({unit:'mm',format:'a4'});const W=210,M=18,CW=W-2*M;let y=M;
+ const ink=[17,19,24],mute=[91,98,112];
+ const col={F:[15,118,110],D:[180,83,9],O:[29,78,216],A:[185,28,28]};
+ const need=h=>{if(y+h>280){doc.addPage();y=M}};
+ const h2=t=>{need(16);y+=4;doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...ink);doc.text(t,M,y);y+=2;doc.setDrawColor(255,79,0);doc.setLineWidth(.6);doc.line(M,y,M+18,y);y+=6};
+ const para=(t,size=10.5)=>{doc.setFont('helvetica','normal');doc.setFontSize(size);doc.setTextColor(...ink);
+  String(t||'').split(/\n+/).filter(s=>s.trim()).forEach(p=>{doc.splitTextToSize(p.trim(),CW).forEach(l=>{need(5.2);doc.text(l,M,y);y+=5.2});y+=2})};
+ // portada
+ doc.setFont('helvetica','bold');doc.setFontSize(22);doc.setTextColor(...ink);doc.text('DAFO personal y plan de acción',M,y+6);y+=13;
+ doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(...mute);
+ doc.text('IPOP (Itinerari Personal per a l\'Orientació Professional) · RA4 y RA5',M,y);y+=6;
+ const meta=[S.datos.nombre,S.datos.ciclo,S.datos.centro,S.datos.fecha].filter(x=>x.trim()).join('  ·  ');
+ if(meta){doc.setTextColor(...ink);doc.text(meta,M,y);y+=6}
+ y+=4;
+ // 1 test
+ h2('1. Resultados del test de competencias clave');
+ doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(...mute);
+ doc.text(`Test .Clau de Barcelona Activa${S.test.fecha?' · realizado el '+S.test.fecha:''}. Competencia más destacada: ${COMPS[S.test.destacada]||'—'}.`,M,y);y+=6;
+ const bx=M+72,seg=17,rh=5.1;
+ doc.setFontSize(7.5);['Inicial','Medio','Medio-alto','Alto'].forEach((t,k)=>doc.text(t,bx+k*seg+seg/2,y,{align:'center'}));y+=2;
+ COMPS.forEach((c,i)=>{need(rh);const l=S.test.niveles[i],m=S.test.media[i];
+  doc.setFontSize(8.5);doc.setTextColor(...(String(S.test.destacada)===String(i)?[193,65,12]:ink));doc.setFont('helvetica',String(S.test.destacada)===String(i)?'bold':'normal');
+  doc.text(c,bx-3,y+3.3,{align:'right'});
+  for(let k=0;k<4;k++){doc.setFillColor(...(k<l?(k===3?[194,65,12]:[255,120-k*20,60-k*15]):[230,232,236]));doc.rect(bx+k*seg+.3,y+.8,seg-.6,3.4,'F')}
+  if(m){doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(...mute);doc.text(m==='+'?'por encima de la media':'por debajo de la media',bx+4*seg+3,y+3.3)}
+  y+=rh});
+ y+=4;
+ if(S.test.notas.trim()){doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...ink);need(8);doc.text('Conclusiones del test',M,y);y+=6;para(S.test.notas)}
+ // 2 dafo
+ doc.addPage();y=M;h2('2. DAFO personal');
+ const list=q=>S.dafo[q].filter(x=>x.text.trim()).map((x,i)=>`${q}${i+1}. ${x.text.trim()}`).join('\n\n')||'—';
+ const hd=q=>({content:Q[q].t.toUpperCase()+'  ·  '+Q[q].s,styles:{fillColor:col[q],textColor:255,fontStyle:'bold',fontSize:10}});
+ doc.autoTable({startY:y,margin:{left:M,right:M},theme:'grid',styles:{font:'helvetica',fontSize:9.2,cellPadding:3,lineColor:[220,223,228],textColor:ink,valign:'top'},
+  columnStyles:{0:{cellWidth:CW/2},1:{cellWidth:CW/2}},
+  body:[[hd('F'),hd('D')],[list('F'),list('D')],[hd('O'),hd('A')],[list('O'),list('A')]]});
+ y=doc.lastAutoTable.finalY+8;
+ const det=['F','D','O','A'].flatMap(q=>S.dafo[q].map((x,i)=>({q,i,x}))).filter(o=>o.x.text.trim()).map(o=>[`${o.q}${o.i+1}`,o.x.text.trim(),(o.q==='F'||o.q==='D')?(o.x.comp!==''&&o.x.comp!=null?`${COMPS[o.x.comp]} (${LV[S.test.niveles[o.x.comp]]}${S.test.media[o.x.comp]==='+'?', sobre la media':S.test.media[o.x.comp]==='-'?', bajo la media':''})`:'Fuera del test'):'Entorno',o.x.evid.trim()||'—']);
+ if(det.length){need(20);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('Justificación de cada elemento',M,y);y+=3;
+  doc.autoTable({startY:y,margin:{left:M,right:M},theme:'striped',styles:{font:'helvetica',fontSize:8.4,cellPadding:2.2,textColor:ink,valign:'top'},headStyles:{fillColor:ink,textColor:255},
+   columnStyles:{0:{cellWidth:10,fontStyle:'bold'},1:{cellWidth:58},2:{cellWidth:38},3:{cellWidth:'auto'}},
+   head:[['','Elemento','Relación con el test','Prueba / fuente']],body:det,
+   didParseCell:d=>{if(d.section==='body'&&d.column.index===0){d.cell.styles.textColor=col[String(d.cell.raw)[0]]}}});
+  y=doc.lastAutoTable.finalY+8}
+ // 3 plan
+ need(50);h2('3. Plan de acción');
+ const byId=Object.fromEntries(allItems().map(x=>[x.it.id,x]));
+ const pr=S.plan.filter(r=>r.obj.trim()||r.acc.trim()).map((r,i)=>{const t=byId[r.ref];return[String(i+1),t?`${t.q}${t.i+1}`:'—',r.obj.trim()||'—',r.acc.trim()||'—',r.rec.trim()||'—',r.plazo.trim()||'—',r.ind.trim()||'—']});
+ doc.autoTable({startY:y,margin:{left:M,right:M},theme:'grid',styles:{font:'helvetica',fontSize:8.2,cellPadding:2.2,textColor:ink,valign:'top',lineColor:[220,223,228]},headStyles:{fillColor:ink,textColor:255,fontSize:8.4},
+  columnStyles:{0:{cellWidth:7},1:{cellWidth:14,fontStyle:'bold'},2:{cellWidth:28},3:{cellWidth:'auto'},4:{cellWidth:34},5:{cellWidth:20},6:{cellWidth:26}},
+  head:[['#','DAFO','Objetivo','Acciones concretas','Recursos / cursos','Plazo','Indicador']],body:pr.length?pr:[['','','—','','','','']],
+  didParseCell:d=>{if(d.section==='body'&&d.column.index===1&&col[String(d.cell.raw)[0]])d.cell.styles.textColor=col[String(d.cell.raw)[0]]}});
+ y=doc.lastAutoTable.finalY+10;
+ // 4 reflexión
+ need(40);h2('4. Reflexión final: soft skills y competencias clave');para(S.reflexion||'—',10.5);
+ const n=doc.getNumberOfPages();for(let p=1;p<=n;p++){doc.setPage(p);doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(...mute);doc.text(`${S.datos.nombre||''}${S.datos.nombre?' · ':''}DAFO personal`,M,290);doc.text(`${p} / ${n}`,W-M,290,{align:'right'})}
+ return doc.output('blob');
+}
+window.__buildPDF=buildPDF;window.__S=()=>S;window.__setS=x=>{S=x;renderAll()};
+}
+</script>
+</body>
+</html>
